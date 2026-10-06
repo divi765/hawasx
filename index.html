@@ -33,7 +33,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Spinner */
     .spinner {
       width: 52px;
       height: 52px;
@@ -87,6 +86,11 @@
   </div>
 
   <script>
+    // ── CONFIG ─────────────────────────────────────────────────────────────────
+    // Default destination when someone hits the main URL with no parameters
+    var DEFAULT_DEST = 'https://t.me/hawax_backup_1bot';
+    // ──────────────────────────────────────────────────────────────────────────
+
     (function () {
       var params = new URLSearchParams(window.location.search);
       var dest = null;
@@ -103,33 +107,28 @@
         dest = 'https://t.me/' + bot + '?start=start';
       }
 
-      // ?u=https://...  →  any full URL (for future use)
+      // ?u=https://...  →  any full URL
       else if (params.get('u')) {
         dest = decodeURIComponent(params.get('u'));
       }
 
-      if (dest) {
-        // Redirect immediately
-        window.location.replace(dest);
-
-        // Show manual button after 1.5s in case browser blocks redirect
-        setTimeout(function () {
-          var btn = document.getElementById('manual-btn');
-          btn.href = dest;
-          btn.style.display = 'inline-block';
-          document.querySelector('p').textContent =
-            'Not redirected automatically? Click the button below.';
-        }, 1500);
-
-      } else {
-        // No valid parameter — show error
-        var card = document.getElementById('card');
-        card.classList.add('error-card');
-        card.innerHTML =
-          '<div class="spinner"></div>' +
-          '<h1>Invalid Link</h1>' +
-          '<p>This link is missing required information.<br>Please get a fresh link from the bot.</p>';
+      // No parameters — redirect to bot by default
+      else {
+        dest = DEFAULT_DEST;
       }
+
+      // Redirect immediately
+      window.location.replace(dest);
+
+      // Show manual button after 1.5s in case browser blocks auto-redirect
+      setTimeout(function () {
+        var btn = document.getElementById('manual-btn');
+        btn.href = dest;
+        btn.style.display = 'inline-block';
+        document.querySelector('p').textContent =
+          'Not redirected? Click the button below.';
+      }, 1500);
+
     })();
   </script>
 </body>
