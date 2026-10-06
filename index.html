@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting...</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #e6edf3;
+    }
+
+    .card {
+      text-align: center;
+      padding: 48px 40px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      max-width: 380px;
+      width: 90%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 4px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 28px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #e6edf3;
+    }
+
+    p {
+      font-size: 0.92rem;
+      color: #8b949e;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #238636;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #2ea043; }
+
+    .error-card h1 { color: #f85149; }
+    .error-card .spinner { border-top-color: #f85149; animation: none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="spinner"></div>
+    <h1>Redirecting you...</h1>
+    <p>Please wait, you will be taken to the destination automatically.</p>
+    <a href="#" class="btn" id="manual-btn" style="display:none;">Open Manually →</a>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var dest = null;
+
+      // ?c=channelname  →  t.me/channelname
+      if (params.get('c')) {
+        var ch = params.get('c').replace(/^@/, '');
+        dest = 'https://t.me/' + ch;
+      }
+
+      // ?b=botname  →  t.me/botname?start=start
+      else if (params.get('b')) {
+        var bot = params.get('b').replace(/^@/, '');
+        dest = 'https://t.me/' + bot + '?start=start';
+      }
+
+      // ?u=https://...  →  any full URL (for future use)
+      else if (params.get('u')) {
+        dest = decodeURIComponent(params.get('u'));
+      }
+
+      if (dest) {
+        // Redirect immediately
+        window.location.replace(dest);
+
+        // Show manual button after 1.5s in case browser blocks redirect
+        setTimeout(function () {
+          var btn = document.getElementById('manual-btn');
+          btn.href = dest;
+          btn.style.display = 'inline-block';
+          document.querySelector('p').textContent =
+            'Not redirected automatically? Click the button below.';
+        }, 1500);
+
+      } else {
+        // No valid parameter — show error
+        var card = document.getElementById('card');
+        card.classList.add('error-card');
+        card.innerHTML =
+          '<div class="spinner"></div>' +
+          '<h1>Invalid Link</h1>' +
+          '<p>This link is missing required information.<br>Please get a fresh link from the bot.</p>';
+      }
+    })();
+  </script>
+</body>
+</html>
